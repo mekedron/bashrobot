@@ -1,0 +1,81 @@
+[
+    [{
+        "site": "bash.im",
+        "name": "bash",
+        "url": "http://bash.im",
+        "quote": ".text",
+        "parsel": ".text",
+        "encoding": "win1251",
+        "linkpar": "/random",
+        "desc": "Цитатник Рунета"
+    }],
+    [{
+        "site": "ithappens.me",
+        "name": "ithappens",
+        "url": "http://ithappens.me",
+        "parsel": ".text",
+        "encoding": "utf-8",
+        "linkpar": "/random",
+        "desc": "IT Happens"
+    }],
+    [{
+        "site": "zadolba.li",
+        "name": "zadolbali",
+        "url": "http://zadolba.li",
+        "parsel": ".text",
+        "encoding": "utf-8",
+        "linkpar": "/random",
+        "desc": "Задолба!ли"
+    }],
+    [{
+        "site": "anekdot.ru",
+        "name": "anecdote",
+        "url": "https://www.anekdot.ru/random",
+        "parsel": ".text",
+        "encoding": "utf-8",
+        "linkpar": "/anekdot/",
+        "desc": "Свежие анекдоты"
+    }, {
+        "site": "anekdot.ru",
+        "name": "story",
+        "url": "https://www.anekdot.ru/random",
+        "parsel": ".text",
+        "encoding": "utf-8",
+        "linkpar": "/story/",
+        "desc": "Новые истории"
+    }, {
+        "site": "anekdot.ru",
+        "name": "aphorism",
+        "url": "https://www.anekdot.ru/random",
+        "parsel": ".text",
+        "encoding": "utf-8",
+        "linkpar": "/aphorism/",
+        "desc": "Новые афоризмы и фразы"
+    }, {
+        "site": "anekdot.ru",
+        "name": "poem",
+        "url": "https://www.anekdot.ru/random",
+        "parsel": ".text",
+        "encoding": "utf-8",
+        "linkpar": "/poems/",
+        "desc": "Стишки"
+    }],
+    [{
+        "site": "det.org.ru",
+        "name": "deti",
+        "url": "http://det.org.ru",
+        "parsel": ".history",
+        "encoding": "win1251",
+        "linkpar": "/?page=random",
+        "desc": "Говорят дети"
+    }],
+    [{
+        "site": "xkcdb.com",
+        "name": "XKCDB",
+        "url": "http://www.xkcdb.com",
+        "parsel": "span.quote",
+        "encoding": "utf-8",
+        "linkpar": "/random",
+        "desc": "XKCDB"
+    }]
+]

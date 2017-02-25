@@ -1,0 +1,35 @@
+{
+  "name": "bashrobot",
+  "version": "0.0.1",
+  "description": "Telegram bot for quotes",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bitrixhater/bashrobot.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "nodejs",
+    "bash.im"
+  ],
+  "author": "bitrixhater",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bitrixhater/bashrobot/issues"
+  },
+  "homepage": "https://github.com/bitrixhater/bashrobot#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "fast.js": "^0.1.1",
+    "he": "^1.1.1",
+    "iconv-lite": "^0.4.15",
+    "mongoose": "^4.8.3",
+    "request": "^2.79.0",
+    "seneca": "^3.3.0",
+    "telegram-node-bot": "git+https://github.com/bitrixhater/telegram-node-bot.git#crutches"
+  }
+}
