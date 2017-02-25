@@ -23,7 +23,7 @@ const tg = new Telegram.Telegram(require('./token').token, {
     port: 3011,
     host: 'localhost'
   },
-  //storage: new MongooseStorage()
+  storage: new MongooseStorage()
 })
 
 if (cluster.isMaster) {
@@ -36,12 +36,19 @@ if (cluster.isMaster) {
   .client()
 }
 
+// TODO: refactor before method
+
 class QuoteController extends TelegramBaseController {
   constructor(config) {
     super()
 
     this.source = config.source || {}
     this.sources = config.sources || [[{}]]
+  }
+
+  before($) {
+    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
+    return $
   }
 
   randomQuoteForUserHandler($) {
@@ -90,6 +97,11 @@ class QuoteController extends TelegramBaseController {
 }
 
 class StartController extends TelegramBaseController {
+  before($) {
+    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
+    return $
+  }
+
   startHandler($) {
     $.sendMessage('Добро пожаловать!\n\nЧтобы посмотреть все команды, нажми /help')
   }
@@ -106,6 +118,11 @@ class HelpController extends TelegramBaseController {
     super()
 
     this.additionalCommands = additionalCommands || ''
+  }
+
+  before($) {
+    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
+    return $
   }
 
   helpHandler($) {
@@ -131,6 +148,11 @@ class HelpController extends TelegramBaseController {
 }
 
 class OtherwiseController extends TelegramBaseController {
+  before($) {
+    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
+    return $
+  }
+
   handle($) {
     $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд')
   }

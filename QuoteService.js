@@ -41,61 +41,105 @@ const Quote = mongoose.model('Quote', QuoteSchema);
 
 module.exports = function quote() {
   this.add('role:quote,cmd:parseAndReturnRandom', function (msg, respond) {
-    if (!msg.source) 
+    if (!msg.source || !msg.source.url || !msg.source.linkpar) 
       return respond(new Error('Source config not found'))
 
     let method = msg.source.method || 'get'
-    let query = msg.source.query || {}
+    let url = msg.source.url + msg.source.linkpar
 
-    TinyRequest[method]({
-        url: msg.source.url + msg.source.linkpar,
-        query: query,
-        binary: true,
-        headers: msg.source.headers || {}
-      }, (body, res, err) => {
-      if (err) 
-        return respond(err)
+    // TODO: refactor
 
-      if (res.statusCode != 200) 
-        return respond(new Error('Cannot parse, try few minutes later'))
+    new Promise((resolve, reject) => {
+      if (msg.source.paginpar && msg.source.paginel) {
+        TinyRequest[method]({
+          url: msg.source.url + msg.source.paginpar,
+          query: msg.source.query || {},
+          headers: msg.source.headers || {}
+        }, (body, res, err) => {
+          if (err) 
+            reject(err)
 
-      body = iconv.decode(Buffer.from(body, 'binary'), msg.source.encoding);
+          if (res.statusCode != 200) 
+            reject(new Error('Cannot parse, try few minutes later'))
 
-      let $ = cheerio.load(body)
-
-      let result = ''
-      let randomInd = Math.floor(Math.random() * $(msg.source.parsel).length)
-      $(msg.source.parsel).each((i, elem) => {
-        // elem = $(elem).html().replace(/<(?:.|\n)*?>/gm, '\n')
-        //   .replace(/&apos;/ig, '\'')
-        //   .replace(/\n\n\n/g, '')
-        elem = $(elem).html()
-              .replace(/<br\s*\/?>/gi, '\n')
-              .replace(/<\/(p|div)>/gi, '\n\n')
-              .replace(/<(?:.|\n)*?>/g, '')
-              .replace(/\n\n\n/g, '\n')
-        elem = he.decode(elem)
-        elem = elem
-              .replace(/\&/g, '&amp;')
-              .replace(/\</g, '&lt;')
-              .replace(/\>/g, '&gt;')
-
-        if (elem.length < 10) return;
-
-        if (i === randomInd) 
-          result = elem
-        let quote = new Quote({
-          sourceName: msg.source.name,
-          text: elem,
-          viewedBy: ((i === randomInd) && msg.chatId) ? [msg.chatId] : []
+          let $ = cheerio.load(body)
+          let page = $($(msg.source.paginel)[0])
+          if (msg.source.pagiattr) {
+            page = page.attr(msg.source.pagiattr)
+          } else {
+            page = page.text()
+          }
+          page = parseInt(page.replace(/[^0-9]/g, ''))
+          resolve(
+            url.replace(
+              '%d', 
+              Math.floor(Math.random() * (page - 1)) + 1
+            )
+          )
         })
-        quote.save()
-      })
-
-      respond({
-        quote: result
-      })
+      } else {
+        resolve(url)
+      }
     })
+    .then(url => new Promise((resolve, reject) => {
+      TinyRequest[method]({
+          url: url,
+          query: msg.source.query || {},
+          headers: msg.source.headers || {},
+          binary: true
+        }, (body, res, err) => {
+        if (err) 
+          reject(err)
+
+        if (res.statusCode != 200) 
+          reject(new Error('Cannot parse, try few minutes later'))
+
+        body = iconv.decode(Buffer.from(body, 'binary'), msg.source.encoding);
+
+        let $ = cheerio.load(body)
+        let result = false
+        let quotesCount = $(msg.source.parsel).length
+
+        $(msg.source.parsel).each((i, elem) => {
+          // elem = $(elem).html().replace(/<(?:.|\n)*?>/gm, '\n')
+          //   .replace(/&apos;/ig, '\'')
+          //   .replace(/\n\n\n/g, '')
+          elem = $(elem).html()
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<\/(p|div)>/gi, '\n\n')
+                .replace(/<(?:.|\n)*?>/g, '')
+                .replace(/\n\n\n/g, '\n')
+          elem = he.decode(elem)
+          elem = elem
+                .replace(/\&/g, '&amp;')
+                .replace(/\</g, '&lt;')
+                .replace(/\>/g, '&gt;')
+
+          if (elem.length < 10)
+            return
+
+          if (!result && ((Math.random() > 0.5) || (i === (quotesCount - 1))))
+            result = elem
+
+          let quote = new Quote({
+            sourceName: msg.source.name,
+            text: elem,
+            viewedBy: ((result === elem) && msg.chatId) ? [msg.chatId] : []
+          })
+          quote.save()
+        })
+
+        if (result)
+          resolve(
+            respond({
+              quote: result
+            })
+          )
+        else
+          reject(new Error('Nothing found'))
+      })
+    }))
+    .catch(respond)
   })
 
   this.add('role:quote,cmd:random', function (msg, respond) {

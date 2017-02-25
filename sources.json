@@ -87,22 +87,49 @@
     "lang": "en"
   }],
   [{
+    "site": "killpls.me",
+    "name": "kmp",
+    "url": "http://killpls.me",
+    "linkpar": "/page/%d",
+    "parsel": "#stories .row > .col-xs-12[style=\"margin:0.5em 0;line-height:1.785em\"]",
+    "paginpar": "/page/1",
+    "paginel": ".paginator:first-child > .pagina:first-child > a",
+    "encoding": "utf-8",
+    "desc": "KILL ME, PLEASE",
+    "lang": "ru"
+  }],
+  [{
+    "site": "ideer.ru",
+    "name": "ideer",
+    "url": "http://ideer.ru",
+    "linkpar": "/?page=%d",
+    "parsel": ".secret .shortContent",
+    "paginpar": "/",
+    "paginel": ".paginator em a",
+    "pageattr": "href",
+    "encoding": "utf-8",
+    "desc": "Подслушано - здесь говорят о тебе",
+    "lang": "ru"
+  }],
+  [{
     "site": "xkcdb.com",
-    "name": "XKCDB",
+    "name": "xkcdb",
     "url": "http://www.xkcdb.com",
+    "linkpar": "/random",
     "parsel": "span.quote",
     "encoding": "utf-8",
-    "linkpar": "/random",
     "desc": "XKCDB",
     "lang": "en"
   }],
   [{
     "site": "quotationspage.com",
     "name": "quotation",
+    "desc": "Motivation and cynical quotes",
+    "lang": "en",
     "url": "http://www.quotationspage.com",
+    "linkpar": "/random.php3",
     "parsel": "dt.quote a",
     "encoding": "iso-8859-1",
-    "linkpar": "/random.php3",
     "method": "post",
     "//query": {
       "number": "24",
@@ -132,9 +159,7 @@
       "Referer": "http://www.quotationspage.com/random.php3",
       "Upgrade-Insecure-Requests": "1",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
-    },
-    "desc": "Motivation and cynical quotes",
-    "lang": "en"
+    }
   }],
   [{
     "site": "bash.org",
@@ -142,9 +167,9 @@
     "desc": "Browse away to your amusement.",
     "lang": "en",
     "url": "http://bash.org",
+    "linkpar": "/?random1",
     "parsel": ".qt",
     "encoding": "iso-8859-1",
-    "linkpar": "/?random1",
     "headers": {
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
       "Accept-Language": "ru,en-US;q=0.8,en;q=0.6",
