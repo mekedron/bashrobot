@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const cheerio = require('cheerio')
 const iconv = require('iconv-lite')
-const request = require('request')
+const TinyRequest = require('tiny_request')
 const he = require('he')
 
 const QuoteSchema = new Schema({ 
@@ -11,7 +11,20 @@ const QuoteSchema = new Schema({
     type: String,
     trim: true
   },
-  viewedBy: [String]
+  votes: [{
+    chatId: String,
+    value: {
+      type: Number,
+      min: -1, max: 1,
+      get: v => Math.round(v),
+      set: v => Math.round(v)
+    }
+  }],
+  viewedBy: [String],
+  addedAt : {
+    type: Date,
+    default: Date.now
+  }
 })
 
 QuoteSchema.statics.random = function(criteria, callback) {
@@ -31,31 +44,50 @@ module.exports = function quote() {
     if (!msg.source) 
       return respond(new Error('Source config not found'))
 
-    request({
+    let method = msg.source.method || 'get'
+    let query = msg.source.query || {}
+
+    TinyRequest[method]({
         url: msg.source.url + msg.source.linkpar,
-        encoding: 'binary'
-      }, (err, res, body) => {
+        query: query,
+        binary: true,
+        headers: msg.source.headers || {}
+      }, (body, res, err) => {
       if (err) 
         return respond(err)
 
       if (res.statusCode != 200) 
         return respond(new Error('Cannot parse, try few minutes later'))
 
-      body = iconv.decode(new Buffer(body, 'binary'), msg.source.encoding);
+      body = iconv.decode(Buffer.from(body, 'binary'), msg.source.encoding);
 
       let $ = cheerio.load(body)
 
       let result = ''
+      let randomInd = Math.floor(Math.random() * $(msg.source.parsel).length)
       $(msg.source.parsel).each((i, elem) => {
-        elem = $(elem).html().replace(/<(?:.|\n)*?>/gm, '\n')
-          .replace(/&apos;/ig, '\'')
-          .replace(/\n\n\n/g, '')
-        if (i === 0) 
+        // elem = $(elem).html().replace(/<(?:.|\n)*?>/gm, '\n')
+        //   .replace(/&apos;/ig, '\'')
+        //   .replace(/\n\n\n/g, '')
+        elem = $(elem).html()
+              .replace(/<br\s*\/?>/gi, '\n')
+              .replace(/<\/(p|div)>/gi, '\n\n')
+              .replace(/<(?:.|\n)*?>/g, '')
+              .replace(/\n\n\n/g, '\n')
+        elem = he.decode(elem)
+        elem = elem
+              .replace(/\&/g, '&amp;')
+              .replace(/\</g, '&lt;')
+              .replace(/\>/g, '&gt;')
+
+        if (elem.length < 10) return;
+
+        if (i === randomInd) 
           result = elem
         let quote = new Quote({
           sourceName: msg.source.name,
           text: elem,
-          viewedBy: (i === 0) ? [msg.chatId] : []
+          viewedBy: ((i === randomInd) && msg.chatId) ? [msg.chatId] : []
         })
         quote.save()
       })
@@ -65,6 +97,7 @@ module.exports = function quote() {
       })
     })
   })
+
   this.add('role:quote,cmd:random', function (msg, respond) {
     let criteria = {}
     if (msg.chatId)
@@ -78,7 +111,7 @@ module.exports = function quote() {
       if (err)
         return respond(err)
 
-      if (!quote)
+      if (!quote && msg.source)
         return this.act({
           role: 'quote',
           cmd: 'parseAndReturnRandom',

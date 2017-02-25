@@ -1,73 +1,90 @@
 [
     [{
         "site": "bash.im",
-        "name": "bash",
+        "name": "bashim",
         "url": "http://bash.im",
-        "quote": ".text",
+        "linkpar": "/random",
         "parsel": ".text",
         "encoding": "win1251",
-        "linkpar": "/random",
-        "desc": "Цитатник Рунета"
+        "desc": "Цитатник Рунета",
+        "lang": "ru"
     }],
     [{
         "site": "ithappens.me",
         "name": "ithappens",
         "url": "http://ithappens.me",
+        "linkpar": "/random",
         "parsel": ".text",
         "encoding": "utf-8",
-        "linkpar": "/random",
-        "desc": "IT Happens"
+        "desc": "IT Happens",
+        "lang": "ru"
     }],
     [{
         "site": "zadolba.li",
         "name": "zadolbali",
         "url": "http://zadolba.li",
+        "linkpar": "/random",
         "parsel": ".text",
         "encoding": "utf-8",
-        "linkpar": "/random",
-        "desc": "Задолба!ли"
+        "desc": "Задолба!ли",
+        "lang": "ru"
     }],
     [{
         "site": "anekdot.ru",
         "name": "anecdote",
         "url": "https://www.anekdot.ru/random",
+        "linkpar": "/anekdot/",
         "parsel": ".text",
         "encoding": "utf-8",
-        "linkpar": "/anekdot/",
-        "desc": "Свежие анекдоты"
+        "desc": "Свежие анекдоты",
+        "lang": "ru"
     }, {
         "site": "anekdot.ru",
         "name": "story",
         "url": "https://www.anekdot.ru/random",
+        "linkpar": "/story/",
         "parsel": ".text",
         "encoding": "utf-8",
-        "linkpar": "/story/",
-        "desc": "Новые истории"
+        "desc": "Новые истории",
+        "lang": "ru"
     }, {
         "site": "anekdot.ru",
         "name": "aphorism",
         "url": "https://www.anekdot.ru/random",
+        "linkpar": "/aphorism/",
         "parsel": ".text",
         "encoding": "utf-8",
-        "linkpar": "/aphorism/",
-        "desc": "Новые афоризмы и фразы"
+        "desc": "Новые афоризмы и фразы",
+        "lang": "ru"
     }, {
         "site": "anekdot.ru",
         "name": "poem",
         "url": "https://www.anekdot.ru/random",
+        "linkpar": "/poems/",
         "parsel": ".text",
         "encoding": "utf-8",
-        "linkpar": "/poems/",
-        "desc": "Стишки"
+        "desc": "Стишки",
+        "lang": "ru"
     }],
     [{
         "site": "det.org.ru",
-        "name": "deti",
+        "name": "kids",
         "url": "http://det.org.ru",
-        "parsel": ".history",
-        "encoding": "win1251",
         "linkpar": "/?page=random",
-        "desc": "Говорят дети"
+        "parsel": ".history:not([style=\"text-align: center;\"])",
+        "encoding": "win1251",
+        "desc": "Говорят дети",
+        "lang": "ru"
+    }],
+    [{
+        "site": "fmylife.com",
+        "name": "fml",
+        "url": "http://www.fmylife.com",
+        "linkpar": "/random",
+        "parsel": "#content article.art-panel .panel-content > p.block a:first-child",
+        "encoding": "utf-8",
+        "desc": "F*** my life",
+        "lang": "en"
     }],
     [{
         "site": "xkcdb.com",
@@ -76,6 +93,87 @@
         "parsel": "span.quote",
         "encoding": "utf-8",
         "linkpar": "/random",
-        "desc": "XKCDB"
+        "desc": "XKCDB",
+        "lang": "en"
+    }],
+    [{
+        "site": "quotationspage.com",
+        "name": "quotation",
+        "url": "http://www.quotationspage.com",
+        "parsel": "dt.quote a",
+        "encoding": "iso-8859-1",
+        "linkpar": "/random.php3",
+        "method": "post",
+        "//query": {
+            "number": "24",
+            "collection": [
+                "mgm",
+                "motivate",
+                "classic",
+                "coles",
+                "lindsly",
+                "poorc",
+                "altq",
+                "20thcent",
+                "bywomen",
+                "devils"
+            ]
+        },
+        "headers": {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "ru,en-US;q=0.8,,en;q=0.6",
+            "Cache-Control": "max-age=0",
+            "Connection": "keep-alive",
+            "Content-Length": "274",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Host": "www.quotationspage.com",
+            "Origin": "http://www.quotationspage.com",
+            "Referer": "http://www.quotationspage.com/random.php3",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
+        },
+        "desc": "Motivation and cynical quotes",
+        "lang": "en"
+    }],
+    [{
+        "site": "bash.org",
+        "name": "bashorg",
+        "desc": "Browse away to your amusement.",
+        "lang": "en",
+        "url": "http://bash.org",
+        "parsel": ".qt",
+        "encoding": "iso-8859-1",
+        "linkpar": "/?random1",
+        "headers": {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "ru,en-US;q=0.8,en;q=0.6",
+            "Cache-Control": "max-age=0",
+            "Connection": "keep-alive",
+            "Host": "www.bash.org",
+            "Referer": "http://www.bash.org/?random",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
+        }
+    }],
+    [{
+        "site": "qdb.us",
+        "name": "qdbus",
+        "desc": "Like /bashorg",
+        "lang": "en",
+        "url": "http://www.qdb.us",
+        "parsel": ".qt",
+        "encoding": "iso-8859-1",
+        "linkpar": "/random",
+        "headers": {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "ru,en-US;q=0.8,en;q=0.6",
+            "Cache-Control": "max-age=0",
+            "Connection": "keep-alive",
+            "Host": "www.qdb.us",
+            "Referer": "http://www.qdb.us/random",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
+        }
     }]
 ]

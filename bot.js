@@ -40,25 +40,50 @@ class QuoteController extends TelegramBaseController {
   constructor(config) {
     super()
 
-    this.config = config
+    this.source = config.source || {}
+    this.sources = config.sources || [[{}]]
   }
 
-  randomQuoteHandler($) {
+  randomQuoteForUserHandler($) {
     seneca
     .act({
       role: 'quote',
       cmd: 'random',
       chatId: $.chatId,
-      source: this.config
+      source: this.source
     }, (err, res) => {
-      $.sendMessage(res.quote, {
-        parse_mode: 'html'
+      $.sendMessage(res.quote || 'Whoops, something went wrong.', {
+        parse_mode: 'html',
+        disable_web_page_preview: true,
+        reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
       })
+    })
+  }
+
+  randomQuoteHandler($) {
+    let randomSourceInd = Math.floor(Math.random() * this.sources.length)
+    let randomVariatInd = Math.floor(Math.random() * this.sources[randomSourceInd].length)
+    seneca
+    .act({
+      role: 'quote',
+      cmd: 'random',
+      chatId: $.chatId,
+      source: this.sources[randomSourceInd][randomVariatInd]
+    }, (err, res) => {
+      $.sendMessage(
+        res.quote || 'Whoops, something went wrong. Data: ' + randomSourceInd + ', ' + randomVariatInd, 
+        {
+          parse_mode: 'html',
+          disable_web_page_preview: true,
+          reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
+        }
+      )
     })
   }
 
   get routes() {
     return {
+      'randomQuoteForUserCommand': 'randomQuoteForUserHandler',
       'randomQuoteCommand': 'randomQuoteHandler'
     }
   }
@@ -66,7 +91,7 @@ class QuoteController extends TelegramBaseController {
 
 class StartController extends TelegramBaseController {
   startHandler($) {
-    $.sendMessage('Добро пожаловать!\n\nЧтобы посмотреть все комманды, нажми /help')
+    $.sendMessage('Добро пожаловать!\n\nЧтобы посмотреть все команды, нажми /help')
   }
 
   get routes() {
@@ -77,20 +102,25 @@ class StartController extends TelegramBaseController {
 }
 
 class HelpController extends TelegramBaseController {
+  constructor(additionalCommands) {
+    super()
+
+    this.additionalCommands = additionalCommands || ''
+  }
+
   helpHandler($) {
-    $.sendMessage('Список комманд:\n'
+    $.sendMessage(
+      'Список команд:\n'
       + '/help - Помощь\n'
-      + '\nКомманды ниже отдают случайную цитату:\n'
-      + '/bash\n'
-      + '/ithappens\n'
-      + '/zadolbali\n'
-      + '/anecdote\n'
-      + '/story\n'
-      + '/aphorism\n'
-      + '/poem\n'
-      + '/deti\n'
-      + '/xkcdb\n'
-      )
+      + '/random - Случайная цитата\n'
+      + '\nКоманды ниже отдают случайную цитату:\n'
+      + this.additionalCommands
+      + '\n\nIf you want to contribute, check out bot\'s github page:\nhttp://github.com/bitrixhater/bashrobot',
+      {
+        disable_web_page_preview: true,
+        reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
+      }
+    )
   }
 
   get routes() {
@@ -102,7 +132,7 @@ class HelpController extends TelegramBaseController {
 
 class OtherwiseController extends TelegramBaseController {
   handle($) {
-    $.sendMessage('Команда не найдена!')
+    $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд')
   }
 }
 
@@ -113,21 +143,34 @@ fast.forEach(sources, variations => {
     router = router.when(
       new TextCommand(
         source.name.replace(/\s/g, ' ').toLowerCase(),
-        'randomQuoteCommand'
+        'randomQuoteForUserCommand'
       ),
-      new QuoteController(source)
+      new QuoteController({
+        source: source
+      })
     )
   })
 })
 
 router = router
   .when(
+    new TextCommand('random', 'randomQuoteCommand'),
+    new QuoteController({
+      sources: sources
+    })
+  )
+  .when(
     new TextCommand('start', 'startCommand'),
     new StartController()
   )
   .when(
     new TextCommand('help', 'helpCommand'),
-    new HelpController()
+    new HelpController(fast.map(sources, variations => {
+      return fast.map(variations, source => {
+        return '/' + source.name.replace(/\s/g, ' ').toLowerCase()
+             + ' - ' + source.desc
+      }).join('\n')
+    }).join('\n'))
   )
   .otherwise(
     new OtherwiseController()
