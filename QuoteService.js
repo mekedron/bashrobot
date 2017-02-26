@@ -117,7 +117,7 @@ module.exports = function quote() {
                 .replace(/\&/g, '&amp;')
                 .replace(/\</g, '&lt;')
                 .replace(/\>/g, '&gt;')
-          elem = trim(elem)
+          elem = elem.trim()
                 .replace(/\s\s/g, ' ')
 
           if (elem.length < 15)
