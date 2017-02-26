@@ -99,19 +99,6 @@
     "lang": "ru"
   }],
   [{
-    "site": "ideer.ru",
-    "name": "ideer",
-    "url": "http://ideer.ru",
-    "linkpar": "/?page=%d",
-    "parsel": ".secret .shortContent",
-    "paginpar": "/",
-    "paginel": ".paginator em a",
-    "pageattr": "href",
-    "encoding": "utf-8",
-    "desc": "Подслушано - здесь говорят о тебе",
-    "lang": "ru"
-  }],
-  [{
     "site": "xkcdb.com",
     "name": "xkcdb",
     "url": "http://www.xkcdb.com",
