@@ -4,6 +4,7 @@
   "description": "Telegram bot for getting random stories",
   "main": "bot.js",
   "scripts": {
+    "start": "screen -dmSL bashrobot node bot -L",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
