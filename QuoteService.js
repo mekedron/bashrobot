@@ -9,7 +9,8 @@ const QuoteSchema = new Schema({
   sourceName: String,
   text: {
     type: String,
-    trim: true
+    trim: true,
+    minlength: 10
   },
   votes: [{
     chatId: String,
@@ -116,8 +117,10 @@ module.exports = function quote() {
                 .replace(/\&/g, '&amp;')
                 .replace(/\</g, '&lt;')
                 .replace(/\>/g, '&gt;')
+          elem = trim(elem)
+                .replace(/\s\s/g, ' ')
 
-          if (elem.length < 10)
+          if (elem.length < 15)
             return
 
           if (!result && ((Math.random() > 0.5) || (i === (quotesCount - 1))))
@@ -128,7 +131,7 @@ module.exports = function quote() {
             text: elem,
             viewedBy: ((result === elem) && msg.chatId) ? [msg.chatId] : []
           })
-          // quote.save()
+          quote.save()
         })
 
         if (result)
