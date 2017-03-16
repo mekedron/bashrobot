@@ -65,7 +65,7 @@ module.exports = function quote() {
 
           let $ = cheerio.load(body)
           let page = $($(msg.source.paginel)[0])
-          console.log(page)
+          // console.log(page)
           if (msg.source.pageattr) {
             page = page.attr(msg.source.pageattr)
           } else {
@@ -84,7 +84,7 @@ module.exports = function quote() {
       }
     })
     .then(url => new Promise((resolve, reject) => {
-      console.log(url)
+      // console.log(url)
       TinyRequest[method]({
           url: url,
           query: msg.source.query || {},
@@ -104,9 +104,6 @@ module.exports = function quote() {
         let quotesCount = $(msg.source.parsel).length
 
         $(msg.source.parsel).each((i, elem) => {
-          // elem = $(elem).html().replace(/<(?:.|\n)*?>/gm, '\n')
-          //   .replace(/&apos;/ig, '\'')
-          //   .replace(/\n\n\n/g, '')
           elem = $(elem).html()
                 .replace(/<br\s*\/?>/gi, '\n')
                 .replace(/<\/(p|div)>/gi, '\n\n')

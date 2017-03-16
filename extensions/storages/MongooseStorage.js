@@ -28,7 +28,7 @@ class MongooseStorage extends BaseStorage {
     super()
 
     options = options || {}
-    let modelName = options.modelName || 'BotStorage'
+    let modelName = options.modelName || 'chats'
 
     this.BotStorage = mongoose.model(modelName, this.constructor.BotStorageSchema)
   }
@@ -39,7 +39,7 @@ class MongooseStorage extends BaseStorage {
    * @param {string} key
    */
   _formatKey(storage, key) {
-    let splittedKey = key.split('_')
+    let splittedKey = key.split('_', 3)
     return {
       storage: storage,
       type: splittedKey[0].toLowerCase(),
@@ -55,6 +55,11 @@ class MongooseStorage extends BaseStorage {
    */
   get(storage, key) { 
     let params = this._formatKey(storage, key)
+    return this.BotStorage.findOne({
+      chatId: params.chatId,
+      type: params.type,
+      'keys.name': params.key
+    })
     .exec()
     .then(chat => new Promise((resolve, reject) => {
       if (chat)

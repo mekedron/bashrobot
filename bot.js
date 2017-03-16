@@ -8,7 +8,10 @@ const TinyRequest = require('tiny_request')
 const TelegramBaseController = Telegram.TelegramBaseController
 const TextCommand = Telegram.TextCommand
 const BaseScopeExtension = Telegram.BaseScopeExtension
-const MongooseStorage = require('./MongooseStorage')
+const MongooseStorage = require('./extensions/storages/MongooseStorage')
+
+const Middleware = require('./extensions/middlewares/Middleware')
+const MiddlewareBaseController = require('./extensions/middlewares/MiddlewareBaseController')
 
 const fast = require('fast.js')
 const mongoose = require('mongoose')
@@ -29,26 +32,43 @@ const tg = new Telegram.Telegram(require('./token').token, {
 if (cluster.isMaster) {
   mongoose.connect('mongodb://localhost/bashrobot')
   seneca
-  .use('QuoteService')
+  .use('QuoteServices')
   .listen()
 } else if (cluster.isWorker) {
   seneca
   .client()
 }
 
-// TODO: refactor before method
+// TODO: add jsdoc
 
-class QuoteController extends TelegramBaseController {
+class UpdateLastActivityMW extends Middleware {
+  updateLastActivity($, resolve, reject) {
+    let set = $.idFromGroupChat ? 'setChatSession' : 'setUserSession';
+    let get = $.idFromGroupChat ? 'getChatSession' : 'getUserSession';
+
+    $[get]('totalRequests')
+    .then(totalRequests => {
+      if (!totalRequests)
+        return $[set]('totalRequests', 1)
+      return $[set]('totalRequests', ++totalRequests)
+    })
+    .then(() => $[set]('lastActivity', Date.now()))
+    .then(() => resolve($))
+  }
+
+  get order() {
+    return ['updateLastActivity']
+  }
+}
+
+// TODO: refactor this trash
+
+class QuoteController extends MiddlewareBaseController {
   constructor(config) {
     super()
 
     this.source = config.source || {}
     this.sources = config.sources || [[{}]]
-  }
-
-  before($) {
-    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
-    return $
   }
 
   randomQuoteForUserHandler($) {
@@ -96,12 +116,7 @@ class QuoteController extends TelegramBaseController {
   }
 }
 
-class StartController extends TelegramBaseController {
-  before($) {
-    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
-    return $
-  }
-
+class StartController extends MiddlewareBaseController {
   startHandler($) {
     $.sendMessage('Добро пожаловать!\n\nЧтобы посмотреть все команды, нажми /help')
   }
@@ -113,16 +128,11 @@ class StartController extends TelegramBaseController {
   }
 }
 
-class HelpController extends TelegramBaseController {
+class HelpController extends MiddlewareBaseController {
   constructor(additionalCommands) {
     super()
 
     this.additionalCommands = additionalCommands || ''
-  }
-
-  before($) {
-    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
-    return $
   }
 
   helpHandler($) {
@@ -147,18 +157,14 @@ class HelpController extends TelegramBaseController {
   }
 }
 
-class OtherwiseController extends TelegramBaseController {
-  before($) {
-    $[$.idFromGroupChat ? 'setChatSession' : 'setUserSession']('lastActivity', Date.now())
-    return $
-  }
-
+class OtherwiseController extends MiddlewareBaseController {
   handle($) {
     $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд')
   }
 }
 
-var router = tg.router
+let router = tg.router
+let updateLastActivityMW = new UpdateLastActivityMW()
 
 fast.forEach(sources, variations => {
   fast.forEach(variations, source => {
@@ -170,6 +176,7 @@ fast.forEach(sources, variations => {
       new QuoteController({
         source: source
       })
+      .middleware(updateLastActivityMW)
     )
   })
 })
@@ -180,10 +187,12 @@ router = router
     new QuoteController({
       sources: sources
     })
+    .middleware(updateLastActivityMW)
   )
   .when(
     new TextCommand('start', 'startCommand'),
     new StartController()
+    .middleware(updateLastActivityMW)
   )
   .when(
     new TextCommand('help', 'helpCommand'),
@@ -193,7 +202,9 @@ router = router
              + ' - ' + source.desc
       }).join('\n')
     }).join('\n'))
+    .middleware(updateLastActivityMW)
   )
   .otherwise(
     new OtherwiseController()
+    .middleware(updateLastActivityMW)
   )
