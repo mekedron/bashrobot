@@ -91,7 +91,7 @@ class MiddlewareBaseController extends TelegramBaseController {
       //         return controller['handle'].apply(controller, newArgs.concat(middleware[1] || []))
       //       })
 
-      //     return $
+      //     return Promise.resolve($)
       //   })
 
       //check middleware for instance of Middleware class
@@ -103,7 +103,7 @@ class MiddlewareBaseController extends TelegramBaseController {
           if (!$.ended)
             return middleware._handle($)
 
-          return $
+          return Promise.resolve($)
         })
 
       //check middleware for function
@@ -116,7 +116,7 @@ class MiddlewareBaseController extends TelegramBaseController {
               return middleware($, resolve, reject)
             })
 
-          return $
+          return Promise.resolve($)
         })
     })
 
@@ -124,7 +124,7 @@ class MiddlewareBaseController extends TelegramBaseController {
       if ($.errors)
         return Promise.reject($.errors)
 
-      return $
+      return Promise.resolve($)
     })
 
     chain = chain.catch(err => {

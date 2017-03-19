@@ -20,7 +20,7 @@ class Middleware {
             return this[middleware]($, resolve, reject)
           })
         }
-        return $
+        return Promise.resolve($)
       })
     })
 
