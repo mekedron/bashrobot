@@ -178,14 +178,14 @@ class HelpController extends MiddlewareBaseController {
 class OtherwiseController extends MiddlewareBaseController {
   handle($) {
     if (!$.idFromGroupChat)
-      $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд', 
+      $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд', {
         reply_markup: JSON.stringify({
           ForceReply: {
             force_reply: true,
             selective: true
           }
         })
-      )
+      })
   }
 }
 
