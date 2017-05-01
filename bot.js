@@ -82,6 +82,12 @@ class QuoteController extends MiddlewareBaseController {
       $.sendMessage(res.quote || 'Whoops, something went wrong.', {
         parse_mode: 'html',
         disable_web_page_preview: true,
+        reply_markup: JSON.stringify({
+          ForceReply: {
+            force_reply: true,
+            selective: true
+          }
+        }),
         reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
       })
     })
@@ -102,6 +108,12 @@ class QuoteController extends MiddlewareBaseController {
         {
           parse_mode: 'html',
           disable_web_page_preview: true,
+          reply_markup: JSON.stringify({
+            ForceReply: {
+              force_reply: true,
+              selective: true
+            }
+          }),
           reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
         }
       )
@@ -145,6 +157,12 @@ class HelpController extends MiddlewareBaseController {
       + '\n\nIf you want to contribute, check out bot\'s github page:\nhttp://github.com/bitrixhater/bashrobot',
       {
         disable_web_page_preview: true,
+        reply_markup: JSON.stringify({
+          ForceReply: {
+            force_reply: true,
+            selective: true
+          }
+        }),
         reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
       }
     )
@@ -159,7 +177,15 @@ class HelpController extends MiddlewareBaseController {
 
 class OtherwiseController extends MiddlewareBaseController {
   handle($) {
-    $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд')
+    if (!$.idFromGroupChat)
+      $.sendMessage('Воспользуйтесь командой /help для просмотра списка возможных команд', 
+        reply_markup: JSON.stringify({
+          ForceReply: {
+            force_reply: true,
+            selective: true
+          }
+        })
+      )
   }
 }
 
