@@ -11,6 +11,9 @@ class MiddlewareBaseController extends TelegramBaseController {
     this._middlewares = []
     
     let self = this
+
+    let lastScope
+
     let chainHandler = function (func) {
       return function () {
         let args = [];
@@ -20,13 +23,14 @@ class MiddlewareBaseController extends TelegramBaseController {
 
         if (args[0])
           return args[0].then($ => {
+            lastScope = $
             return new Promise((resolve, reject) => {
               args.shift() // delete chain promise
-              resolve(func.apply(self, [$/*, resolve, reject*/].concat(args)))
+              return resolve(func.apply(self, [$/*, resolve, reject*/].concat(args)))
             })
-            .catch(err => {
-              this.catch(err, $)
-            })
+          })
+          .catch(err => {
+            self.catch(err, lastScope)
           })
       }
     }
@@ -65,7 +69,7 @@ class MiddlewareBaseController extends TelegramBaseController {
       //if middlewares is a catcher
       if (middleware instanceof MiddlewareCatcher) 
         return chain = chain.catch(err => {
-          return middleware.catch(err, scope)
+          throw middleware.catch(err, scope)
         })
 
       //check middleware for array, if the array its controller
@@ -129,9 +133,9 @@ class MiddlewareBaseController extends TelegramBaseController {
 
     chain = chain.catch(err => {
       if (catcher)
-        return catcher.catch(err, scope)
+        throw catcher.catch(err, scope)
 
-      return this.catch(err, scope)
+      throw this.catch(err, scope)
     })
 
     return chain // insted of real $ return the chain promise, real $ will return in the promise

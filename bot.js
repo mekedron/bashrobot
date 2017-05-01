@@ -61,6 +61,22 @@ class UpdateLastActivityMW extends Middleware {
   }
 }
 
+class DoNotHandleOldMessages extends Middleware {
+  doNotHandleOldMessages($, resolve, reject) {
+    let difference = $.message.date - Math.floor(Date.now() / 1000);
+    if (difference >= -30 && difference <= -5) {
+      return reject('Almost new')
+    } else if (difference < -30) {
+      return reject('Old')
+    }
+    return resolve($)
+  }
+
+  get order() {
+    return ['doNotHandleOldMessages']
+  }
+}
+
 // TODO: refactor this trash
 
 class QuoteController extends MiddlewareBaseController {
@@ -191,6 +207,7 @@ class OtherwiseController extends MiddlewareBaseController {
 
 let router = tg.router
 let updateLastActivityMW = new UpdateLastActivityMW()
+let doNotHandleOldMessages = new DoNotHandleOldMessages()
 
 fast.forEach(sources, variations => {
   fast.forEach(variations, source => {
@@ -203,6 +220,7 @@ fast.forEach(sources, variations => {
         source: source
       })
       .middleware(updateLastActivityMW)
+      .middleware(doNotHandleOldMessages)
     )
   })
 })
@@ -214,11 +232,13 @@ router = router
       sources: sources
     })
     .middleware(updateLastActivityMW)
+    .middleware(doNotHandleOldMessages)
   )
   .when(
     new TextCommand('start', 'startCommand'),
     new StartController()
     .middleware(updateLastActivityMW)
+    .middleware(doNotHandleOldMessages)
   )
   .when(
     new TextCommand('help', 'helpCommand'),
@@ -229,8 +249,10 @@ router = router
       }).join('\n')
     }).join('\n'))
     .middleware(updateLastActivityMW)
+    .middleware(doNotHandleOldMessages)
   )
   .otherwise(
     new OtherwiseController()
     .middleware(updateLastActivityMW)
+    .middleware(doNotHandleOldMessages)
   )
