@@ -184,9 +184,26 @@ class HelpController extends MiddlewareBaseController {
     )
   }
 
+  chlenHandler($) {
+    $.sendMessage(
+      '/chlen',
+      {
+        disable_web_page_preview: true,
+        reply_markup: JSON.stringify({
+          ForceReply: {
+            force_reply: true,
+            selective: true
+          }
+        }),
+        reply_to_message_id: $.idFromGroupChat ? $.message.messageId : ''
+      }
+    )
+  }
+
   get routes() {
     return {
-      'helpCommand': 'helpHandler'
+      'helpCommand': 'helpHandler',
+      'chlenCommand': 'chlenHandler'
     }
   }
 }
@@ -225,6 +242,13 @@ fast.forEach(sources, variations => {
   })
 })
 
+let helpController = new HelpController(fast.map(sources, variations => {
+  return fast.map(variations, source => {
+    return '/' + source.name.replace(/\s/g, ' ').toLowerCase()
+         + ' - ' + source.desc
+  }).join('\n')
+}).join('\n'))
+
 router = router
   .when(
     new TextCommand('random', 'randomQuoteCommand'),
@@ -241,13 +265,14 @@ router = router
     .middleware(doNotHandleOldMessages)
   )
   .when(
+    new TextCommand('chlen', 'chlenCommand'),
+    helpController
+    .middleware(updateLastActivityMW)
+    .middleware(doNotHandleOldMessages)
+  )
+  .when(
     new TextCommand('help', 'helpCommand'),
-    new HelpController(fast.map(sources, variations => {
-      return fast.map(variations, source => {
-        return '/' + source.name.replace(/\s/g, ' ').toLowerCase()
-             + ' - ' + source.desc
-      }).join('\n')
-    }).join('\n'))
+    helpController
     .middleware(updateLastActivityMW)
     .middleware(doNotHandleOldMessages)
   )
