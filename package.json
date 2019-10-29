@@ -28,7 +28,7 @@
     "fast.js": "^0.1.1",
     "he": "^1.1.1",
     "iconv-lite": "^0.4.15",
-    "mongoose": "^4.8.3",
+    "mongoose": "^5.7.7",
     "seneca": "^3.3.0",
     "telegram-node-bot": "git+https://github.com/bitrixhater/telegram-node-bot.git#crutches",
     "tiny_request": "git+https://github.com/bitrixhater/tiny_request.git"
